@@ -1,0 +1,61 @@
+#ifndef HONEY_BADGER_LOOKUPS_H
+#define HONEY_BADGER_LOOKUPS_H
+
+#include "types.h"
+
+extern const Bitboard LINE_BITBOARDS_[NO_SQUARE][NO_SQUARE];
+extern const Bitboard SEGMENT_BITBOARDS_[NO_SQUARE][NO_SQUARE];
+
+extern const Bitboard PAWN_ATTACKS_BITBOARDS_[NO_COLOR][NO_SQUARE];
+extern const Bitboard KNIGHT_ATTACKS_BITBOARDS_[NO_SQUARE];
+extern const Bitboard BISHOP_MASKS_[NO_SQUARE];
+extern const u8 BISHOP_SHIFTS_[NO_SQUARE];
+extern const u16 BISHOP_OFFSETS_[NO_SQUARE];
+extern const u64 BISHOP_MAGICS_[NO_SQUARE];
+extern const Bitboard BISHOP_ATTACKS_BITBOARDS_[5248];
+extern const Bitboard ROOK_MASKS_[NO_SQUARE];
+extern const u8 ROOK_SHIFTS_[NO_SQUARE];
+extern const u32 ROOK_OFFSETS_[NO_SQUARE];
+extern const u64 ROOK_MAGICS_[NO_SQUARE];
+extern const Bitboard ROOK_ATTACKS_BITBOARDS_[102400];
+extern const Bitboard KING_ATTACKS_BITBOARDS_[NO_SQUARE];
+
+extern const Key PIECE_SQUARE_KEYS_[NO_PIECE][NO_SQUARE];
+extern const Key EN_PASSANT_KEYS_[NO_FILE];
+extern const Key CASTLING_RIGHTS_KEYS_[CASTLING_RIGHTS_ALL + 1];
+extern const Key SIDE_TO_MOVE_KEY_;
+
+#define NNUE_INPUT_SIZE (768)
+#define NNUE_HIDDEN_SIZE (256)
+
+extern const i16 NNUE_ACCUMULATOR_WEIGHTS_[NNUE_INPUT_SIZE][NNUE_HIDDEN_SIZE];
+extern const i16 NNUE_ACCUMULATOR_BIASES_[NNUE_HIDDEN_SIZE];
+extern const i16 NNUE_OUTPUT_WEIGHTS_[2 * NNUE_HIDDEN_SIZE];
+extern const i32 NNUE_OUTPUT_BIAS_;
+
+#define LINE_BITBOARD(from, to) (LINE_BITBOARDS_[(from)][(to)])
+#define SEGMENT_BITBOARD(from, to) (SEGMENT_BITBOARDS_[(from)][(to)])
+
+#define PAWN_ATTACKS_BITBOARD(c, sq) (PAWN_ATTACKS_BITBOARDS_[(c)][(sq)])
+#define KNIGHT_ATTACKS_BITBOARD(sq) (KNIGHT_ATTACKS_BITBOARDS_[(sq)])
+#define BISHOP_ATTACKS_BITBOARD(sq, occ) \
+    (BISHOP_ATTACKS_BITBOARDS_[BISHOP_OFFSETS_[(sq)] + \
+        ((((occ) & BISHOP_MASKS_[(sq)]) * BISHOP_MAGICS_[(sq)]) >> BISHOP_SHIFTS_[(sq)])])
+#define ROOK_ATTACKS_BITBOARD(sq, occ) \
+    (ROOK_ATTACKS_BITBOARDS_[ROOK_OFFSETS_[(sq)] + \
+        ((((occ) & ROOK_MASKS_[(sq)]) * ROOK_MAGICS_[(sq)]) >> ROOK_SHIFTS_[(sq)])])
+#define QUEEN_ATTACKS_BITBOARD(sq, occ) \
+    (BISHOP_ATTACKS_BITBOARD(sq, occ) | ROOK_ATTACKS_BITBOARD(sq, occ))
+#define KING_ATTACKS_BITBOARD(sq) (KING_ATTACKS_BITBOARDS_[(sq)])
+
+#define PIECE_SQUARE_KEY(p, sq) (PIECE_SQUARE_KEYS_[(p)][(sq)])
+#define EN_PASSANT_KEY(f) (EN_PASSANT_KEYS_[(f)])
+#define CASTLING_RIGHTS_KEY(cr) (CASTLING_RIGHTS_KEYS_[(cr)])
+#define SIDE_TO_MOVE_KEY (SIDE_TO_MOVE_KEY_)
+
+#define NNUE_ACCUMULATOR_WEIGHTS(f) (NNUE_ACCUMULATOR_WEIGHTS_[(f)])
+#define NNUE_ACCUMULATOR_BIAS(i) (NNUE_ACCUMULATOR_BIASES_[(i)])
+#define NNUE_OUTPUT_WEIGHT(i) (NNUE_OUTPUT_WEIGHTS_[(i)])
+#define NNUE_OUTPUT_BIAS (NNUE_OUTPUT_BIAS_)
+
+#endif
